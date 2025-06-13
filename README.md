@@ -6,7 +6,7 @@ Bu proje, Finansbank'ın test ortamı üzerinden 3D Secure (3D_PAY) ödeme modun
 
 1. Projeyi klonlayın:
 ```bash
-git clone [repo-url]
+git clone https://github.com/ibrahimysr/finansbank_3d_secure
 cd 3d_payment
 ```
 
@@ -42,20 +42,6 @@ FINANS_FAILURE_URL=/payment/failure
 php artisan key:generate
 ```
 
-6. Veritabanı ayarlarını yapılandırın:
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=your_database
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
-```
-
-7. Gerekli izinleri ayarlayın:
-```bash
-chmod -R 775 storage bootstrap/cache
-```
 
 ## Test Kartları
 
@@ -96,10 +82,3 @@ Alternatif Test Kartı:
 
 Hata durumunda `storage/logs/laravel.log` dosyasını kontrol edin. Tüm ödeme işlemleri ve hatalar burada loglanır.
 
-## Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
-
-## İletişim
-
-Sorularınız için: proje@nlksoft.com
