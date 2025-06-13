@@ -1,0 +1,140 @@
+/* Modern Payment Form Styles */
+:root {
+    --primary: #0d6efd;
+    --success: #198754;
+    --danger: #dc3545;
+    --light: #f8f9fa;
+    --dark: #212529;
+    --muted: #6c757d;
+}
+
+body {
+    background: var(--light);
+    min-height: 100vh;
+}
+
+.payment-card, .success-card, .fail-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02),
+                0 8px 16px rgba(0,0,0,0.02);
+    padding: 2rem;
+}
+
+/* Form Elements */
+.form-control, .input-group-text {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control {
+    background: var(--light) !important;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    background: #fff !important;
+}
+
+.input-group-text {
+    color: var(--muted);
+    background: var(--light) !important;
+}
+
+.form-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--dark);
+    margin-bottom: 0.75rem;
+}
+
+/* Security Badges */
+.security-badges .badge {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background: var(--light);
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.security-badges .badge i,
+.security-badges .badge svg {
+    color: var(--primary);
+}
+
+/* Submit Button */
+.btn-primary {
+    padding: 1rem;
+    font-weight: 500;
+    background: var(--primary);
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+}
+
+/* Success/Fail Icons */
+.icon-success i {
+    font-size: 4rem;
+    color: var(--success);
+    animation: pop 0.5s cubic-bezier(.68,-0.55,.27,1.55) 1;
+}
+
+.icon-fail i {
+    font-size: 4rem;
+    color: var(--danger);
+    animation: shake 0.5s cubic-bezier(.68,-0.55,.27,1.55) 1;
+}
+
+/* Payment Details Box */
+.payment-details-box {
+    background: var(--light);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.payment-details-box .table {
+    margin-bottom: 0;
+}
+
+.payment-details-box th {
+    font-weight: 500;
+    color: var(--muted);
+    padding: 0.75rem 0;
+    border: none;
+}
+
+.payment-details-box td {
+    color: var(--dark);
+    padding: 0.75rem 0;
+    border: none;
+}
+
+/* Animations */
+@keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    90% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .payment-card {
+        padding: 1.5rem;
+    }
+    
+    .security-badges .badge {
+        display: block;
+        margin: 0.5rem auto;
+        width: fit-content;
+    }
+} 
