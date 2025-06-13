@@ -6,7 +6,7 @@ Bu proje, Finansbank'ın test ortamı üzerinden 3D Secure (3D_PAY) ödeme modun
 
 1. Projeyi klonlayın:
 ```bash
-git clone [repo-url]
+git clone https://github.com/ibrahimysr/finansbank_3d_secure
 cd 3d_payment
 ```
 
