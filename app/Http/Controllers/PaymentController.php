@@ -13,62 +13,105 @@ use Exception;
 class PaymentController extends Controller
 {
     private FinansbankPaymentService $paymentService;
+    private array $config;
 
     public function __construct(FinansbankPaymentService $paymentService)
     {
         $this->paymentService = $paymentService;
+        $this->config = config('payment.finans');
         $this->middleware('web')->except(['success', 'failure']);
     }
 
     public function form()
     {
-        return view('payment.form');
+        $testMode = $this->config['test_mode'];
+        $testData = null;
+
+        if ($testMode) {
+            $testData = [
+                'card' => $this->config['test_cards']['visa'],
+                'customer' => $this->config['test_customer']
+            ];
+        }
+
+        return view('payment.form', compact('testMode', 'testData'));
     }
 
     public function initiate(Request $request)
     {
-        $request->validate([
+        $rules = [
             'amount' => 'required|numeric|min:1',
-            'card_number' => [
-                'required',
-                'string',
-                function($attribute, $value, $fail) {
-                    $digits = preg_replace('/\D/', '', $value);
-                    if (strlen($digits) !== 16) {
-                        $fail('Kart numarası 16 haneli olmalıdır.');
-                    }
-                }
-            ],
-            'expiry' => 'required|string',
-            'cvv' => 'required|string',
-            'cardholder_name' => 'required|string',
-            'email' => 'required|email',
-        ], [
+        ];
+
+        $messages = [
             'amount.required' => 'Tutar alanı zorunludur.',
             'amount.numeric' => 'Tutar alanı sayı olmalıdır.',
             'amount.min' => 'Tutar en az 1 olmalıdır.',
-            'card_number.required' => 'Kart numarası alanı zorunludur.',
-            'expiry.required' => 'Son kullanma tarihi alanı zorunludur.',
-            'cvv.required' => 'CVV alanı zorunludur.',
-            'cardholder_name.required' => 'Kart üzerindeki isim alanı zorunludur.',
-            'email.required' => 'E-posta alanı zorunludur.',
-            'email.email' => 'Geçerli bir e-posta adresi giriniz.',
-        ]);
+        ];
+
+        if (!$this->config['test_mode']) {
+            $rules = array_merge($rules, [
+                'card_number' => [
+                    'required',
+                    'string',
+                    function($attribute, $value, $fail) {
+                        $digits = preg_replace('/\D/', '', $value);
+                        if (strlen($digits) !== 16) {
+                            $fail('Kart numarası 16 haneli olmalıdır.');
+                        }
+                    }
+                ],
+                'expiry' => 'required|string',
+                'cvv' => 'required|string',
+                'cardholder_name' => 'required|string',
+                'email' => 'required|email',
+            ]);
+
+            $messages = array_merge($messages, [
+                'card_number.required' => 'Kart numarası alanı zorunludur.',
+                'expiry.required' => 'Son kullanma tarihi alanı zorunludur.',
+                'cvv.required' => 'CVV alanı zorunludur.',
+                'cardholder_name.required' => 'Kart üzerindeki isim alanı zorunludur.',
+                'email.required' => 'E-posta alanı zorunludur.',
+                'email.email' => 'Geçerli bir e-posta adresi giriniz.',
+            ]);
+        }
+
+        $request->validate($rules, $messages);
 
         try {
             $amount = number_format((float) $request->input('amount'), 2, '', '');
-            $dto = new PaymentRequestDTO(
-                OrderId: uniqid('ORD'),
-                Amount: $amount,
-                Pan: str_replace(' ', '', $request->input('card_number')),
-                Expiry: str_replace(['/', ' '], '', $request->input('expiry')),
-                Cvv2: $request->input('cvv'),
-                CardholderName: $request->input('cardholder_name'),
-                Email: $request->input('email'),
-                Tel: $request->input('phone'),
-                CustomerIp: $request->ip(),
-                InstallmentCount: (int) $request->input('installment_count', 0)
-            );
+
+            if ($this->config['test_mode']) {
+                $testCard = $this->config['test_cards']['visa'];
+                $testCustomer = $this->config['test_customer'];
+
+                $dto = new PaymentRequestDTO(
+                    OrderId: uniqid('ORD'),
+                    Amount: $amount,
+                    Pan: $testCard['number'],
+                    Expiry: $testCard['expiry'],
+                    Cvv2: $testCard['cvv'],
+                    CardholderName: $testCard['holder'],
+                    Email: $testCustomer['email'],
+                    Tel: $testCustomer['phone'],
+                    CustomerIp: $request->ip(),
+                    InstallmentCount: 0
+                );
+            } else {
+                $dto = new PaymentRequestDTO(
+                    OrderId: uniqid('ORD'),
+                    Amount: $amount,
+                    Pan: str_replace(' ', '', $request->input('card_number')),
+                    Expiry: str_replace(['/', ' '], '', $request->input('expiry')),
+                    Cvv2: $request->input('cvv'),
+                    CardholderName: $request->input('cardholder_name'),
+                    Email: $request->input('email'),
+                    Tel: $request->input('phone'),
+                    CustomerIp: $request->ip(),
+                    InstallmentCount: (int) $request->input('installment_count', 0)
+                );
+            }
 
             $payment = Payment::create([
                 'order_id' => $dto->OrderId,
